@@ -11,14 +11,14 @@ func StoreLogs[T any](todo T) error {
 		return err
 	}
 
-	if err = os.WriteFile("/home/kami-sama/projects/toDoListCli/json.txt", data, 0644); err != nil {
+	if err = os.WriteFile("/home/kami-sama/lunaar/projects/TodoList/json.txt", data, 0644); err != nil {
 		return err
 	}
 	return nil
 }
 
 func LoadLogs[T any](todo *T) error {
-	data, err := os.ReadFile("/home/kami-sama/projects/toDoListCli/json.txt")
+	data, err := os.ReadFile("/home/kami-sama/lunaar/projects/TodoList/json.txt")
 	if err != nil {
 		return err
 	}
