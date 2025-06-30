@@ -31,7 +31,15 @@ func (cf *cmdFlags) Execute(todos *Todos) {
 	switch {
 	case cf.Add != "":
 		todos.add(cf.Add)
-		fmt.Printf("   Task added to your log..\n\n")
+		args := flag.Args()
+		for _, task := range args {
+			todos.add(task)
+		}
+		if len(args) == 0 {
+			fmt.Printf("   Task added to your log..\n\n")
+		} else {
+			fmt.Printf("   Tasks added to your log..\n\n")
+		}
 	case cf.Del != -1:
 		todos.delete(cf.Del)
 		fmt.Printf("   Task deleted from log..\n\n")

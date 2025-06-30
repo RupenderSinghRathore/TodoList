@@ -6,7 +6,7 @@ import (
 )
 
 func StoreLogs[T any](todo T) error {
-	data, err := json.MarshalIndent(todo, "", "    ")
+	data, err := json.Marshal(todo)
 	if err != nil {
 		return err
 	}
