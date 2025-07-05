@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"slices"
 )
 
 type Todo struct {
@@ -36,8 +37,7 @@ func (todos *Todos) delete(i int) error {
 	if err := todos.CheckIndex(i); err != nil {
 		return err
 	}
-	t := *todos
-	*todos = append(t[:i], t[i+1:]...)
+	*todos = slices.Delete(*todos, i, i+1)
 	return nil
 }
 func (todos *Todos) done(i int) error {
