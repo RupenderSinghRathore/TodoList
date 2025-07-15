@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+	"strings"
 )
 
 type Todo struct {
@@ -11,15 +12,19 @@ type Todo struct {
 	Completed bool
 }
 
-type Todos []Todo
+type Todos []*Todo
 
 func (todos *Todos) add(title string) {
+	title = strings.TrimSpace(title)
+	if len(title) == 0 {
+		return
+	}
 	todo := Todo{
 		Title:     title,
 		Completed: false,
 	}
 
-	*todos = append(*todos, todo)
+	*todos = append(*todos, &todo)
 }
 
 // add another methode to Todos to check validity of index
@@ -30,14 +35,18 @@ func (todos *Todos) CheckIndex(i int) error {
 	}
 	return nil
 }
-func (todos *Todos) delete(i int) error {
+func (todos *Todos) delete(tasks ...int) error {
 
-	i--
+	for _, i := range tasks {
+		i--
 
-	if err := todos.CheckIndex(i); err != nil {
-		return err
+		if err := todos.CheckIndex(i); err != nil {
+			return err
+		}
+		// *todos = slices.Delete(*todos, i, i+1)
+		(*todos)[i] = nil
 	}
-	*todos = slices.Delete(*todos, i, i+1)
+	cleanup(todos)
 	return nil
 }
 func (todos *Todos) done(i int) error {
@@ -47,8 +56,7 @@ func (todos *Todos) done(i int) error {
 		return err
 	}
 
-	strt := &t[i]
-	strt.Completed = true
+	t[i].Completed = true
 
 	return nil
 }
@@ -70,4 +78,14 @@ func (todos *Todos) log() {
 }
 func (todos *Todos) clear() {
 	*todos = Todos{}
+}
+
+func cleanup(t *Todos) {
+	for i := 0; i < len(*t); {
+		if (*t)[i] == nil {
+			*t = slices.Delete(*t, i, i+1)
+			continue
+		}
+		i++
+	}
 }
