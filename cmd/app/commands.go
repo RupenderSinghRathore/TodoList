@@ -12,6 +12,7 @@ type cmdFlags struct {
 	Done  int
 	Log   bool
 	Clear bool
+	Purge bool
 }
 
 func NewCmdFlags() *cmdFlags {
@@ -22,26 +23,27 @@ func NewCmdFlags() *cmdFlags {
 	flag.IntVar(&cf.Done, "done", -1, "Marks the task completed")
 	flag.BoolVar(&cf.Log, "log", false, "Prints the task log")
 	flag.BoolVar(&cf.Clear, "clear", false, "Clear all logs")
+	flag.BoolVar(&cf.Purge, "purge", false, "Clear completed logs")
 
 	flag.Parse()
 
 	return &cf
 }
 
-func (cf *cmdFlags) Execute(todos *Todos) {
+func (cf *cmdFlags) Execute(t *Todos) {
 	switch {
 	case cf.Add != "":
-		todos.add(cf.Add)
+		t.add(cf.Add)
 		args := flag.Args()
 		for _, task := range args {
-			todos.add(task)
+			t.add(task)
 		}
 		if len(args) == 0 {
 			fmt.Printf("   Task added to your log..\n\n")
 		} else {
 			fmt.Printf("   Tasks added to your log..\n\n")
 		}
-		todos.log()
+		t.log()
 	case cf.Del != -1:
 		args := flag.Args()
 		lis := []int{cf.Del}
@@ -52,34 +54,38 @@ func (cf *cmdFlags) Execute(todos *Todos) {
 			}
 			lis = append(lis, i)
 		}
-		todos.delete(lis...)
+		t.delete(lis...)
 		if len(args) == 0 {
 			fmt.Printf("   Task deleted from log..\n\n")
 		} else {
 			fmt.Printf("   Tasks deleted from log..\n\n")
 		}
-		todos.log()
+		t.log()
 	case cf.Done != -1:
-		todos.done(cf.Done)
+		t.done(cf.Done)
 		args := flag.Args()
 		for _, taskstr := range args {
 			task, err := strconv.Atoi(taskstr)
 			if err != nil {
 				fmt.Printf("   > %s has to be a positive Integer\n", taskstr)
 			}
-			todos.done(task)
+			t.done(task)
 		}
 		if len(args) == 0 {
 			fmt.Printf("   Task completed..\n\n")
 		} else {
 			fmt.Printf("   Tasks completed..\n\n")
 		}
-		todos.log()
+		t.log()
 	case cf.Log:
-		todos.log()
+		t.log()
 	case cf.Clear:
-		todos.clear()
+		t.clear()
 		fmt.Printf("    All logs cleared!\n\n")
+	case cf.Purge:
+		t.purge()
+		fmt.Printf("    logs Purged!\n\n")
+		t.log()
 	default:
 		fmt.Printf("   $Invalid Command$\n\n")
 	}
